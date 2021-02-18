@@ -37,7 +37,6 @@ public class Crypta {
             logger.info("Успешно сделали ключик");
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             logger.error("Ошибка создания ключа шифрования " + ex.getMessage());
-//            Loggator.commonLog(Level.SEVERE,"Ошибка создания ключа шифрования " + ex.getMessage());
         }
 
     }
@@ -49,7 +48,6 @@ public class Crypta {
             return Base64.getEncoder().encodeToString(cipher.doFinal(str.getBytes("UTF-8")));
         } catch (Exception e) {
             logger.error("Ошибка кодирования " + e.getMessage());
-//            Loggator.commonLog(Level.SEVERE,"Ошибка кодирования " + e.getMessage());
             return null;
         }
     }
@@ -61,7 +59,6 @@ public class Crypta {
             return new String(cipher.doFinal(Base64.getDecoder().decode(str)));
         } catch (Exception e) {
             logger.error("Ошибка декодирования " + e.getMessage());
-//            Loggator.commonLog(Level.SEVERE,"Ошибка декодирования " + e.getMessage());
             return null;
         }
     }

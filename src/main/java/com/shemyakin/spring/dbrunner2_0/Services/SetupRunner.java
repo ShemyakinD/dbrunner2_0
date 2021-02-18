@@ -16,23 +16,21 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.logging.Level;
 
-//@Component
-//@Scope("singleton")
+@Service
+@Scope("singleton")
+@DependsOn({"runnerFolders","runnerConfigurationParams","crypta","runnerXMLConf"})
 public class SetupRunner {
     private static final Logger logger = LoggerFactory.getLogger(SetupRunner.class);
 
     @Autowired
-    private XMLizer xmLizer;
+    RunnerFolders runnerFolders;
 
     @Autowired
-    private RunnerConfigurationParams runnerConfigurationParams;
+    RunnerXMLConf runnerXMLConf;
 
-    public SetupRunner( @Autowired RunnerConfigurationParams runnerConfigurationParams){
-        System.out.println("Start SETUP");
-        logger.warn("DIRECTORY: " + runnerConfigurationParams.getSetupPath());
-/*        if (!(new File(SetupRunner.geDBDir())).exists()) {
-            xmLizer.writeDBDataToXML();
-        }*/
+    public SetupRunner(){
+
+
     }
 
     /*public static Properties getSetupProperties() {
@@ -57,13 +55,13 @@ public class SetupRunner {
         return getInstallDir() + "Databases.xml";
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void InstallKurwanner() {
 
         for (Database db : xmLizer.getDBList()){
             prepareFolder(db);
         }
-    }
+    }*/
 
     public static void prepareFolder(Database db) {
 //        logger.warn(db.getFolder());

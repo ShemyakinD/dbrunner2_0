@@ -13,6 +13,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,9 +35,6 @@ import java.io.IOException;
 @DependsOn({"runnerFolders","runnerConfigurationParams","crypta"})
 public class RunnerXMLConf {
     private static final Logger logger = LoggerFactory.getLogger(RunnerXMLConf.class);
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     private Crypta crypta;
@@ -73,15 +73,6 @@ public class RunnerXMLConf {
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void  writeDBDataToXML() {
-        initDBDataToXML();
-
-        createDB((Database) applicationContext.getBean("OracleDatabase", new File (runnerConfigurationParams.getSetupPath() + "DB1"), "localhost:1521/XEPDB1", "DIMON", "Q1w2e3r4t5y6", true));
-        createDB((Database) applicationContext.getBean("OracleDatabase", new File (runnerConfigurationParams.getSetupPath() + "DB2"), "localhost:1521/XEPDB2", "TECHUSER", "Q1w2e3r4t5y6", true));
-        createDB((Database) applicationContext.getBean("OracleDatabase", new File (runnerConfigurationParams.getSetupPath() + "DB3"), "localhost:1521/XEPDB3", "VIEWERUSER", "Q1w2e3r4t5y6", true));
-    }
-
     public void createDB(Database database) {
         Element db;
         Element nested;
@@ -107,6 +98,24 @@ public class RunnerXMLConf {
         } catch (Exception e) {
             logger.error("Ошибка записи параметров БД");
             e.printStackTrace();
+        }
+    }
+
+    public void removeDB(Database database) {
+        try {
+            Document document = dbf.newDocumentBuilder().parse(new File(runnerConfigurationParams.getXmlConfigurePath()));
+            NodeList matchedElementList = document.getElementsByTagName("database");
+            for (int temp = 0; temp < matchedElementList.getLength(); temp++) {
+                Node nNode = matchedElementList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    if (database.getName().equals(eElement.getAttribute("name")))
+                        nNode.getParentNode().removeChild(nNode);
+                }
+            }
+            SaveDBXML(document);
+        } catch (IOException | ParserConfigurationException | SAXException ioException) {
+            ioException.printStackTrace();
         }
     }
 

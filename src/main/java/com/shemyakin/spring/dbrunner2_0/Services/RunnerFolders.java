@@ -54,7 +54,7 @@ public class RunnerFolders {
         (new File(db.getFolder() + "\\Fail")).mkdirs();
     }
 
-    public static void dropDbFolder(Database db, boolean force) throws SetupException {
+    public void dropDbFolder(Database db, boolean force) throws SetupException {
         if (checkDbFolderContent(db.getFolder()) || force){
             deleteFolder(db.getFolder());
 //            Loggator.commonLog(Level.INFO,"Каталог " + db.getFolder().getAbsolutePath() + " успешно удалён");
@@ -62,7 +62,7 @@ public class RunnerFolders {
         else throw new SetupException("Каталог БД {"+ db.getName() +"} содержит внутри себя файлы.\nВы уверены, что хотите удалить каталог?", Level.WARNING);
     }
 
-    private static boolean checkDbFolderContent(File folder){
+    private boolean checkDbFolderContent(File folder){
         File[] files = folder.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -73,7 +73,7 @@ public class RunnerFolders {
         return true;
     }
 
-    private static void deleteFolder(File folder) throws SetupException{
+    private void deleteFolder(File folder) throws SetupException{
         if (folder.isDirectory()){
             File[] files = folder.listFiles();
             if (files != null) {
