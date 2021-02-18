@@ -1,0 +1,4 @@
+<bean id="employee" class="com.baeldung.beanfactory.Employee">
+    <constructor-arg name="name" value="Hello! My name is Java"/>
+    <constructor-arg name="age" value="18"/>
+</bean>
