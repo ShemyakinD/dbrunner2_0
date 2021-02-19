@@ -1,4 +1,4 @@
-package com.shemyakin.spring.dbrunner2_0;
+package com.shemyakin.spring.dbrunner2_0.Configure;
 
 import lombok.Getter;
 import lombok.Setter;

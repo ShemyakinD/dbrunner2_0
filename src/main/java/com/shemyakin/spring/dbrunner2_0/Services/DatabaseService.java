@@ -1,14 +1,9 @@
 package com.shemyakin.spring.dbrunner2_0.Services;
 
 import com.shemyakin.spring.dbrunner2_0.Entities.Database;
-import com.shemyakin.spring.dbrunner2_0.Entities.OracleDatabase;
 import com.shemyakin.spring.dbrunner2_0.Entities.SetupException;
-import com.shemyakin.spring.dbrunner2_0.RunnerConfigurationParams;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
@@ -16,9 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-@Repository
+@Service
 @Scope("singleton")
-public class DatabaseChanger {
+public class DatabaseService {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -48,6 +43,10 @@ public class DatabaseChanger {
         } catch (SetupException e) {
             e.printStackTrace();
         }
+    }
+
+    public Database getRunnableDBInfoByName(String name){
+        return runnerXMLConf.getDBInfoFromXMLByName(name);
     }
 
 }

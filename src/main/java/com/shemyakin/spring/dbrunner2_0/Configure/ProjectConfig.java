@@ -1,7 +1,8 @@
-package com.shemyakin.spring.dbrunner2_0;
+package com.shemyakin.spring.dbrunner2_0.Configure;
 
 import com.shemyakin.spring.dbrunner2_0.Entities.Database;
 import com.shemyakin.spring.dbrunner2_0.Entities.OracleDatabase;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 
@@ -25,6 +26,11 @@ public class ProjectConfig {
     @Scope("prototype")
     public Database createDBOracleName(String folder, String connection, String username, String password, Boolean isActive){
         return createDBOracleFile(new File (runnerConfigurationParams.getSetupPath() + folder),connection,username,password,isActive);
+    }
+
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
     }
 
 }

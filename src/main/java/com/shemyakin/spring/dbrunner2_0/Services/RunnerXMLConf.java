@@ -1,15 +1,13 @@
 package com.shemyakin.spring.dbrunner2_0.Services;
 
 import com.shemyakin.spring.dbrunner2_0.Entities.Database;
-import com.shemyakin.spring.dbrunner2_0.RunnerConfigurationParams;
+import com.shemyakin.spring.dbrunner2_0.Configure.RunnerConfigurationParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,7 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
@@ -146,9 +143,30 @@ public class RunnerXMLConf {
             }
             return dbList;
         } catch (Exception e) {
-            logger.error("Ошибка считывая списка БД " + e.getMessage());
-//            Loggator.commonLog(Level.SEVERE,"Ошибка считывая списка БД " + e.getMessage());
-            System.out.println("Ошибка считывая списка БД " + e.getMessage());
+            logger.error("Ошибка считывания списка БД " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Database getDBInfoFromXMLByName(String databaseName){
+        try {
+            Document document = dbf.newDocumentBuilder().parse(new File(runnerConfigurationParams.getXmlConfigurePath()));
+            NodeList matchedElementList = document.getElementsByTagName("database");
+            for (int i = 0; i < matchedElementList.getLength(); i++) {
+                Node xmlDB = matchedElementList.item(i);
+                if (xmlDB.getNodeType() == Node.ELEMENT_NODE && xmlDB.getAttributes().getNamedItem("name").getNodeValue().equalsIgnoreCase(databaseName)) {
+                        Element eElement = (Element) xmlDB;
+                        String dbFolder = eElement.getAttribute("name");
+                        Boolean dbActive = Boolean.parseBoolean(eElement.getAttribute("isActive"));
+                        String dbConnection = eElement.getElementsByTagName("connection").item(0).getTextContent();
+                        String dbUsername = eElement.getElementsByTagName("username").item(0).getTextContent();
+                        String dbPassword = Crypta.decrypt(eElement.getElementsByTagName("password").item(0).getTextContent());
+                        return (Database) applicationContext.getBean("OracleDatabaseByName", dbFolder, dbConnection, dbUsername, dbPassword, dbActive);
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Ошибка считывания информации о БД " + e.getMessage());
             return null;
         }
     }

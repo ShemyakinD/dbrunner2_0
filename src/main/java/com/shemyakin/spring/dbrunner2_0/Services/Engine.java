@@ -29,7 +29,7 @@ import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
-@DependsOn({"databaseChanger","runnerFolders"})
+@DependsOn({"databaseService","runnerFolders"})
 public class Engine {
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
