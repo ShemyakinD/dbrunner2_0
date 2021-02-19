@@ -25,39 +25,21 @@ public class RunnerFolders {
     @Autowired
     private RunnerConfigurationParams runnerConfigurationParams;
 
-/*    public static String getInstallDir() {
-        return "setupPath";
-    }*/
-
-/*    public String geDBDir() {
-        return runnerConfigurationParams.getSetupPath() + "Databases.xml";
-    }*/
-
-/*    @PostConstruct
-    public void InstallKurwanner() {
-
-        for (Database db : xmLizer.getDBList()){
-            prepareFolder(db);
-        }
-    }*/
-
     @PostConstruct
     public void prepareRunnerFolder() {
-//        logger.warn(db.getFolder());
-        logger.warn("INSTALL DIR - " + runnerConfigurationParams.getSetupPath());
+        logger.info("Путь установки DBRunner: " + runnerConfigurationParams.getSetupPath());
         (new File(runnerConfigurationParams.getSetupPath())).mkdirs();
     }
 
     public void prepareDBFolders(Database db) {
-//        logger.warn(db.getFolder());
-        (new File(db.getFolder() + "\\Success")).mkdirs();
-        (new File(db.getFolder() + "\\Fail")).mkdirs();
+        if ((new File(db.getFolder() + "\\Success")).mkdirs() && (new File(db.getFolder() + "\\Fail")).mkdirs())
+            logger.info("Созданы директории для БД " + db.getName());
     }
 
     public void dropDbFolder(Database db, boolean force) throws SetupException {
         if (checkDbFolderContent(db.getFolder()) || force){
             deleteFolder(db.getFolder());
-//            Loggator.commonLog(Level.INFO,"Каталог " + db.getFolder().getAbsolutePath() + " успешно удалён");
+            logger.info("Каталог " + db.getFolder().getAbsolutePath() + " успешно удалён");
         }
         else throw new SetupException("Каталог БД {"+ db.getName() +"} содержит внутри себя файлы.\nВы уверены, что хотите удалить каталог?", Level.WARNING);
     }

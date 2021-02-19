@@ -1,7 +1,13 @@
 package com.shemyakin.spring.dbrunner2_0.Services;
 
+import com.shemyakin.spring.dbrunner2_0.Entities.Database;
 import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,18 +19,31 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
+@DependsOn({"databaseChanger","runnerFolders"})
 public class Engine {
-   /* @Scheduled(fixedRate = 120000)
-    private static void CheckRun() {
-        List<Database> databasesList = XMLizer.getDBList();
-        for (Database db: databasesList) {
+    private static final Logger logger = LoggerFactory.getLogger(Engine.class);
+
+    @Autowired
+    private RunnerXMLConf runnerXMLConf;
+
+    private static Set<Database> processingDB = new HashSet<>();
+    private static ExecutorService dbService = Executors.newCachedThreadPool();
+
+    @Scheduled(fixedRate = 60000)
+    private void CheckRun() {
+        for (Database db: runnerXMLConf.getDBList()) {
             if (db.getFolder().listFiles((file) -> file.getName().endsWith(".sql")).length > 0) {
-                if (!processingDB.contains(db) && db.getActive()){
+                if (!processingDB.contains(db) && db.getIsActive()){
                     //runEngine(db);
                     processingDB.add(db);
                     dbService.submit(() -> runEngine(db));
@@ -48,11 +67,11 @@ public class Engine {
                     file.isFile() && file.getName().endsWith(".sql")
             );
             for (File sqlFile : sqlFiles) {
-                Loggator.execLog(Level.INFO, db.getName(), "Начата обработка файла " + sqlFile.getName());
+                logger.info("База данных <" + db.getName() + ">. Начата обработка файла " + sqlFile.getName());
                 runSQL(conn, sqlFile, db);
             }
         } catch (SQLException sqle) {
-            Loggator.execLog(Level.SEVERE, db.getName(), sqle.getMessage());
+            logger.error("База данных <" + db.getName() + ">. Ошибка запуска: " + sqle.getMessage());
             sqle.printStackTrace();
             processingDB.remove(db);
         }
@@ -65,13 +84,13 @@ public class Engine {
             sr.setSendFullScript(true);
             try (BufferedReader reader = new BufferedReader(new FileReader(runFile))) {
                 sr.runScript(reader);
-                Loggator.execLog(Level.INFO, db.getName(), "Файл " + runFile.getName() + " успешно обработан.");
+                logger.info("База данных <" + db.getName() + ">. Файл " + runFile.getName() + " успешно обработан");
                 reader.close();
                 runFile.renameTo(new File(db.getFolder() + "\\Success\\" + runFile.getName()));
                 runFile.delete();
             }
             catch (IOException ioe){
-                Loggator.commonLog(Level.WARNING,"Ошибка чтения файла " + runFile.getAbsolutePath());
+                logger.warn("База данных <" + db.getName() + ">. Ошибка чтения файла " + runFile.getAbsolutePath());
             }
             catch (RuntimeSqlException rsqle){
                 throw new SQLException(rsqle);
@@ -80,15 +99,15 @@ public class Engine {
         }
         catch (SQLException sqle) {
             if (sqle.getMessage().indexOf("ORA-04021") == -1) {
-                Loggator.execLog(Level.WARNING, db.getName(), "Ошибка выполнения файла! " + runFile.getName() + "\n\t" + sqle.getMessage().substring(sqle.getMessage().lastIndexOf(" Cause: ")));
+                logger.warn("База данных <" + db.getName() + ">. Ошибка выполнения файла! " + runFile.getName() + "\n\t" + sqle.getMessage().substring(sqle.getMessage().lastIndexOf(" Cause: ")));
                 runFile.renameTo(new File(db.getFolder() + "\\Fail\\" + runFile.getName()));
                 runFile.delete();
             } else {
-                Loggator.execLog(Level.WARNING, db.getName(), "Файл " + runFile.getName() + " содержит объект, который сейчас заблокирован.\n\t" + sqle.getMessage().substring(sqle.getMessage().lastIndexOf(" Cause: ")));
+                logger.warn("База данных <" + db.getName() + ">. Файл " + runFile.getName() + " содержит объект, который сейчас заблокирован.\n\t" + sqle.getMessage().substring(sqle.getMessage().lastIndexOf(" Cause: ")));
             }
         }
         finally {
             processingDB.remove(db);
         }
-    }*/
+    }
 }

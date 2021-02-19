@@ -29,6 +29,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
@@ -38,7 +41,8 @@ public class RunnerXMLConf {
 
     @Autowired
     private Crypta crypta;
-
+    @Autowired
+    private ApplicationContext applicationContext;
     @Autowired
     private RunnerConfigurationParams runnerConfigurationParams;
 
@@ -114,8 +118,38 @@ public class RunnerXMLConf {
                 }
             }
             SaveDBXML(document);
+            logger.info("Удалена запись о БД " + database.toString());
         } catch (IOException | ParserConfigurationException | SAXException ioException) {
+            logger.error("Ошибка удаления записи БД в XML");
             ioException.printStackTrace();
+        }
+    }
+
+    public List<Database> getDBList(){
+        try {
+            List<Database> dbList = new ArrayList();
+            Document document = dbf.newDocumentBuilder().parse(new File(runnerConfigurationParams.getXmlConfigurePath()));
+            NodeList matchedElementList = document.getElementsByTagName("database");
+
+            for (int temp = 0; temp < matchedElementList.getLength(); temp++) {
+                Node nNode = matchedElementList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    String dbFolder = eElement.getAttribute("name");
+                    Boolean dbActive = Boolean.parseBoolean(eElement.getAttribute("isActive"));
+                    String dbConnection = eElement.getElementsByTagName("connection").item(0).getTextContent();
+                    String dbUsername = eElement.getElementsByTagName("username").item(0).getTextContent();
+                    String dbPassword = Crypta.decrypt(eElement.getElementsByTagName("password").item(0).getTextContent());
+
+                    dbList.add((Database) applicationContext.getBean("OracleDatabaseByName", dbFolder, dbConnection, dbUsername, dbPassword, dbActive));
+                }
+            }
+            return dbList;
+        } catch (Exception e) {
+            logger.error("Ошибка считывая списка БД " + e.getMessage());
+//            Loggator.commonLog(Level.SEVERE,"Ошибка считывая списка БД " + e.getMessage());
+            System.out.println("Ошибка считывая списка БД " + e.getMessage());
+            return null;
         }
     }
 

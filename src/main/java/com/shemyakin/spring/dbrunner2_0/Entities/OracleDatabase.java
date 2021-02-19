@@ -29,6 +29,10 @@ public class OracleDatabase implements Database {
         this.isActive = isActive;
     }
 
+    public OracleDatabase(String folder, String connection, String username, String password, Boolean isActive) {
+        this(new File(folder),connection,username,password,isActive);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

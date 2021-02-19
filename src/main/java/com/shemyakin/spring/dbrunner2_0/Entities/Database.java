@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 
-@Component
+//@Component
 public interface Database {
     String getConnection();
     String getUsername();
@@ -14,4 +14,5 @@ public interface Database {
     Boolean getIsActive();
     File getFolder();
     String getName();
+
 }
