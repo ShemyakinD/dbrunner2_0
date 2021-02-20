@@ -15,7 +15,7 @@ public class DatabaseDTO {
     private String username;
     private Boolean isActive;
 
-    public void getNameFromFolder(File folder) throws ParseException {
+    public void getNameFromFolder(File folder){
         this.name = folder.getName();
     }
 

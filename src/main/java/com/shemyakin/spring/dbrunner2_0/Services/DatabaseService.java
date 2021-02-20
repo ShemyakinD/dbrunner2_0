@@ -1,12 +1,12 @@
 package com.shemyakin.spring.dbrunner2_0.Services;
 
 import com.shemyakin.spring.dbrunner2_0.Entities.Database;
-import com.shemyakin.spring.dbrunner2_0.Entities.SetupException;
+import com.shemyakin.spring.dbrunner2_0.Exceptions.DatabaseServiceException;
+import com.shemyakin.spring.dbrunner2_0.Exceptions.SetupException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -45,8 +45,16 @@ public class DatabaseService {
         }
     }
 
-    public Database getRunnableDBInfoByName(String name){
-        return runnerXMLConf.getDBInfoFromXMLByName(name);
+    public Database getRunnableDBInfoByName(String name) throws DatabaseServiceException{
+        Database db = runnerXMLConf.getDBInfoFromXMLByName(name);
+        if (db == null)
+            throw new DatabaseServiceException("Ошибка поиска БД: " + name);
+        return db;
+    }
+
+    public void updateRunnableDBIsActiveAttribute(String databaseName, String status) throws DatabaseServiceException{
+        if (!runnerXMLConf.setIsActiveAttribute(getRunnableDBInfoByName(databaseName), status))
+            throw new DatabaseServiceException("Ошибка установки флага активности базе данных: " + databaseName);
     }
 
 }

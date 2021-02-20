@@ -1,7 +1,7 @@
 package com.shemyakin.spring.dbrunner2_0.Services;
 
 import com.shemyakin.spring.dbrunner2_0.Entities.Database;
-import com.shemyakin.spring.dbrunner2_0.Entities.SetupException;
+import com.shemyakin.spring.dbrunner2_0.Exceptions.SetupException;
 import com.shemyakin.spring.dbrunner2_0.Configure.RunnerConfigurationParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

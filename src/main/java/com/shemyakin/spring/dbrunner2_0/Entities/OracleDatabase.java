@@ -2,20 +2,17 @@ package com.shemyakin.spring.dbrunner2_0.Entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Objects;
 
-//@Component
+@Getter @Setter
 public class OracleDatabase implements Database {
-    @Getter @Setter private File folder;
-    @Getter @Setter private String connection;
-    @Getter @Setter private String username;
-    @Getter @Setter private String password;
-    @Getter @Setter private Boolean isActive;
+    private File folder;
+    private String connection;
+    private String username;
+    private String password;
+    private Boolean isActive;
 
     public String getName(){
         return folder.getName();

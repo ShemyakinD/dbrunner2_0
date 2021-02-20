@@ -1,0 +1,13 @@
+### Получаем инфу о БД
+curl -v http://localhost:8080/db/{db_name}
+### Проставляем признак активности для БД
+curl -X PUT http://localhost:8080/db/sched/{db_name}
+### Убираем признак активности для БД
+curl -X DELETE http://localhost:8080/db/sched/{db_name}
+
+--------------
+### Получаем инфу о БД
+curl -v http://localhost:8080/db/{db_name}
+### Получаем инфу о БД
+curl -v http://localhost:8080/db/{db_name}### Получаем инфу о БД
+curl -v http://localhost:8080/db/{db_name}

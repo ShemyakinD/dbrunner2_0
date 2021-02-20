@@ -1,11 +1,7 @@
-package com.shemyakin.spring.dbrunner2_0.Entities;
+package com.shemyakin.spring.dbrunner2_0.Exceptions;
 
-import com.shemyakin.spring.dbrunner2_0.Dbrunner20Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.logging.Level;
 

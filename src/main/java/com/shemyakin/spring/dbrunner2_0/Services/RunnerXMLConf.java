@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
@@ -168,6 +169,31 @@ public class RunnerXMLConf {
         } catch (Exception e) {
             logger.error("Ошибка считывания информации о БД " + e.getMessage());
             return null;
+        }
+    }
+    public boolean setIsActiveAttribute(Database db, String value) {
+        try {
+            if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
+                return false;
+            Document document = dbf.newDocumentBuilder().parse(new File(runnerConfigurationParams.getXmlConfigurePath()));
+            NodeList matchedElementList = document.getElementsByTagName("database");
+            for (int i = 0; i < matchedElementList.getLength(); i++) {
+                Node xmlDB = matchedElementList.item(i);
+                if (xmlDB.getNodeType() == Node.ELEMENT_NODE) {
+                    Node element = xmlDB.getAttributes().getNamedItem("isActive");
+                    if (xmlDB.getAttributes().getNamedItem("name").getNodeValue().equals(db.getName())){
+                        element.setNodeValue(value.toLowerCase());
+                        SaveDBXML(document);
+                        logger.info("Базе данных " + db.getName() + " установлен флаг активности: " + value);
+                        return true;
+                    }
+                }
+            }
+           return false;
+        } catch (Exception e) {
+            logger.warn("Ошибка установки флага активности БД " + db.getName() + "\n" + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 
