@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/db")
@@ -21,34 +23,48 @@ public class DatabaseController {
     @Autowired
     private DatabaseService databaseService;
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<DatabaseDTO> getDatabaseList() {
+        return convertToDto(databaseService.getDBAvailableList());
+    }
+
     @GetMapping(path = "/{db_name}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public DatabaseDTO getDatabaseInfo(@PathVariable("db_name") String dbName) throws DatabaseServiceException {
-        return convertToDto(databaseService.getRunnableDBInfoByName(dbName));
+        return convertToDto(databaseService.getDBInfoByName(dbName));
     }
 
     @PutMapping(path = "/sched/{db_name}")
     @ResponseStatus(HttpStatus.OK)
     public void setIsActiveDbAttribute(@PathVariable("db_name") String dbName) throws DatabaseServiceException {
-        databaseService.updateRunnableDBIsActiveAttribute(dbName,"true");
+        databaseService.updateDBIsActiveAttribute(dbName,"true");
     }
 
     @DeleteMapping(path = "/sched/{db_name}")
     @ResponseStatus(HttpStatus.OK)
     public void setIsNotActiveDbAttribute(@PathVariable("db_name") String dbName) throws DatabaseServiceException {
-        databaseService.updateRunnableDBIsActiveAttribute(dbName,"false");
+        databaseService.updateDBIsActiveAttribute(dbName,"false");
     }
 
     private DatabaseDTO convertToDto(Database database) {
         DatabaseDTO databaseDTO = modelMapper.map(database, DatabaseDTO.class);
-        try {
+//        try {
             databaseDTO.getNameFromFolder(database.getFolder());
-        }
-        catch (ParseException pe){
+//        }
+        /*catch (ParseException pe){
             return databaseDTO;
-        }
+        }*/
 
         return databaseDTO;
+    }
+
+    private List<DatabaseDTO> convertToDto(List<Database> databases) {
+        List<DatabaseDTO> databasesDTO = databases
+                .stream()
+                .map(database -> modelMapper.map(database, DatabaseDTO.class))
+                .collect(Collectors.toList());
+        return databasesDTO;
     }
 
     private Database convertToEntity(DatabaseDTO postDto) throws ParseException {

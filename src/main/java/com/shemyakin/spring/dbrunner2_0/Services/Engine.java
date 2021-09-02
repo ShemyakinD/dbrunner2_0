@@ -29,19 +29,18 @@ import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
-@DependsOn({"databaseService","runnerFolders"})
 public class Engine {
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
     @Autowired
-    private RunnerXMLConf runnerXMLConf;
+    private DatabaseService databaseService;
 
     private static Set<Database> processingDB = new HashSet<>();
     private static ExecutorService dbService = Executors.newCachedThreadPool();
 
     @Scheduled(fixedRate = 60000)
     private void CheckRun() {
-        for (Database db: runnerXMLConf.getDBList()) {
+        for (Database db: databaseService.getDBAvailableList()) {
             if (db.getFolder().listFiles((file) -> file.getName().endsWith(".sql")).length > 0) {
                 if (!processingDB.contains(db) && db.getIsActive()){
                     //runEngine(db);

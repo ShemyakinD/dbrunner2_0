@@ -33,7 +33,7 @@ import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
-@DependsOn({"runnerFolders","runnerConfigurationParams","crypta"})
+@DependsOn("runnerFolders")
 public class RunnerXMLConf {
     private static final Logger logger = LoggerFactory.getLogger(RunnerXMLConf.class);
 
@@ -123,7 +123,7 @@ public class RunnerXMLConf {
         }
     }
 
-    public List<Database> getDBList(){
+    public List<Database> getDBListFromXml(){
         try {
             List<Database> dbList = new ArrayList();
             Document document = dbf.newDocumentBuilder().parse(new File(runnerConfigurationParams.getXmlConfigurePath()));

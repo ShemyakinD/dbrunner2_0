@@ -16,7 +16,6 @@ import java.util.logging.Level;
 
 @Service
 @Scope("singleton")
-@DependsOn("runnerConfigurationParams")
 public class RunnerFolders {
 
     private static final Logger logger = LoggerFactory.getLogger(RunnerFolders.class);
